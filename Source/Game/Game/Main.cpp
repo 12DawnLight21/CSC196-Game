@@ -2,6 +2,7 @@
 #include "Core/FileIO.h" 
 #include "Core/memory.h"
 #include "Core/Time.h"
+#include "Renderer/Renderer.h"
 #include <iostream> //searches the system instead
 using namespace std;
 
@@ -19,8 +20,41 @@ void funcs() //will crash your shit with a stack overflow
 }
 */
 
-int main()
+int main(int argc, char* argv[])
 {
+	umbra::Renderer renderer;
+	renderer.Initialize();
+	renderer.CreateWindow("CSC196", 800, 600);
+
+	while (true)
+	{
+		renderer.SetColor(0, 0, 0, 0);
+		//renderer.BeginFrame();
+		//draw
+		//renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
+
+		for (int i = 0; i < 1000; i++)
+		{
+			renderer.DrawPoint(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()));
+		}
+		/*
+		for (int i = 0; i < 10; i++)
+		{
+			renderer.DrawLine(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()), renderer.GetWidth(), 
+				umbra::random(renderer.GetHeight()));
+		}
+		*/
+
+		renderer.EndFrame();
+	}
+
+	return 0;
+	
+
+	//umbra::CreateWindow("CSC196", 800, 600);
+	//cin.get(); // is a pause, prevents window from opening/closing too fast
+	
+	/*
 	//memory time fellas
 	umbra::g_memoryTracker.DisplayInfo();
 	int* p = new int; //holds the ADDRESS of an int
@@ -31,18 +65,13 @@ int main()
 	umbra::Time timer;
 	for (int i = 0; i < 10000000000000000000; i++) {}
 	cout << timer.GetElapsedSeconds() << endl;
-
-
+	*/
 
 	//chrono time, literally	
 	//auto start = std::chrono::high_resolution_clock::now(); //auto - figures out the datatype by the code assignment
 	//for (int i = 0; i < 10000000000000000000; i++) {}
 	//auto end = std::chrono::high_resolution_clock::now();
 	//cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() << endl; //<casts> it into microsecodns
-
-
-
-
 
 	/*
 	cout << umbra::getFilePath() << endl;
