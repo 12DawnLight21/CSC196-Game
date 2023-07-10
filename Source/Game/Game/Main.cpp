@@ -1,5 +1,7 @@
 #include "Renderer/Renderer.h"
 #include "Core/Core.h" //linked to a bunch of directories
+#include "Renderer/Model.h"
+#include "Input/InputSystem.h"
 #include <iostream> //searches the system instead
 #include <vector>
 using namespace std;
@@ -23,8 +25,8 @@ public:
 	}
 
 public:
-	umbra::Vector2 m_pos;
-	umbra::Vector2 m_vel;
+	umbra::vec2 m_pos;
+	umbra::vec2 m_vel;
 };
 
 //adds literally too many things at once
@@ -50,6 +52,32 @@ int main(int argc, char* argv[])
 	umbra::Renderer renderer;
 	renderer.Initialize();
 	renderer.CreateWindow("CSC196", 800, 600);
+
+	umbra::InputSystem inputSystem;
+	inputSystem.Initialize();
+
+	bool quit = false;
+
+	while (!quit) 
+	{
+		inputSystem.Update();
+		if (inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE))
+		{
+			quit = true;
+		}
+
+
+	}
+
+
+
+
+	//triangle time
+	std::vector<umbra::vec2> points{ {-10, 5}, { 10, 5 }, { -10, -5 }, {-10, 5} }; //initializer list, dont need to specify vec2 cause it already knows
+	umbra::Model model(points);  
+	umbra::vec2 v{5, 5};
+	v.Normalize();
+
 
 	//vector<umbra::Vector2> points; //an array of values
 	vector<Star> stars; //not in a namespace so its fine
@@ -78,6 +106,7 @@ int main(int argc, char* argv[])
 			renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
 		}
 
+		model.Draw(renderer, {400, 300}, 25.6);
 
 		/*
 		for (int i = 0; i < 1000; i++)
