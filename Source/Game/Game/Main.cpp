@@ -1,12 +1,33 @@
-#include "Core/random.h" //"" for same directory
-#include "Core/FileIO.h" 
-#include "Core/memory.h"
-#include "Core/Time.h"
 #include "Renderer/Renderer.h"
+#include "Core/Core.h" //linked to a bunch of directories
 #include <iostream> //searches the system instead
+#include <vector>
 using namespace std;
 
-//adds literally too much shit at once
+class Star
+{
+public:
+	Star(const umbra::Vector2& pos, const umbra::Vector2& vel):
+		m_pos{pos},
+		m_vel{vel}
+	{}
+
+	void Update()
+	{
+		m_pos += m_vel;
+	}
+
+	void Draw(umbra::Renderer& renderer)
+	{
+		renderer.DrawPoint(m_pos.x, m_pos.y);
+	}
+
+public:
+	umbra::Vector2 m_pos;
+	umbra::Vector2 m_vel;
+};
+
+//adds literally too many things at once
 /*
 void func()
 {
@@ -22,26 +43,55 @@ void funcs() //will crash your shit with a stack overflow
 
 int main(int argc, char* argv[])
 {
+	
+	umbra::seedRandom((unsigned int)time(nullptr));
+	
+	//our window setup
 	umbra::Renderer renderer;
 	renderer.Initialize();
 	renderer.CreateWindow("CSC196", 800, 600);
 
+	//vector<umbra::Vector2> points; //an array of values
+	vector<Star> stars; //not in a namespace so its fine
+
+	for (int i = 0; i < 1000; i++)
+	{
+		umbra::Vector2 pos(umbra::Vector2(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight())));
+		umbra::Vector2 vel(umbra::randomf(0.7f, 4), 0.0f);
+
+		stars.push_back(Star(pos, vel));
+	}
+
 	while (true)
 	{
-		renderer.SetColor(0, 0, 0, 0);
-		//renderer.BeginFrame();
+		renderer.SetColor(0, 0, 0, 0); //sets color to black
+		renderer.BeginFrame(); //clears the screen, allows for less static
 		//draw
-		//renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
 
+		for (auto& star : stars) //literally just made space screensaver
+		{
+			star.Update();
+
+			if (star.m_pos.x >= renderer.GetWidth()) star.m_pos.x = 0;
+			if (star.m_pos.y >= renderer.GetHeight()) star.m_pos.y = 0;
+			renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
+			renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
+		}
+
+
+		/*
 		for (int i = 0; i < 1000; i++)
 		{
+			umbra::Vector2 pos(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()));
+
+			renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255); //sets a random color BEFORE its drawn
 			renderer.DrawPoint(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()));
+			//renderer.DrawLine(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()), renderer.GetWidth(), umbra::random(renderer.GetHeight()));
 		}
-		/*
+
 		for (int i = 0; i < 10; i++)
 		{
-			renderer.DrawLine(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()), renderer.GetWidth(), 
-				umbra::random(renderer.GetHeight()));
+			
 		}
 		*/
 
@@ -49,7 +99,7 @@ int main(int argc, char* argv[])
 	}
 
 	return 0;
-	
+}
 
 	//umbra::CreateWindow("CSC196", 800, 600);
 	//cin.get(); // is a pause, prevents window from opening/closing too fast
@@ -96,5 +146,3 @@ int main(int argc, char* argv[])
 		cout << umbra::random(10, 20) << endl;
 	}
 	*/
-
-}

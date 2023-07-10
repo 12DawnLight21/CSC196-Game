@@ -21,7 +21,9 @@ namespace umbra
 
 			void SetColor(int r, int g, int b, int a); //gets colors using int values
 			void DrawLine(int x1, int y1, int x2, int y2); //its LINE time!!
+			void DrawLine(float x1, float y1, float x2, float y2); 
 			void DrawPoint(int x, int y); //math forever haunts me
+			void DrawPoint(float x, float y);
 
 			int GetWidth() const { return m_width; } //returns copy of the value
 			int GetHeight() const { return m_height; } //does NOT change value of private variables
