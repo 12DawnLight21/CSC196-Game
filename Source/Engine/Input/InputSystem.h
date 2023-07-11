@@ -1,6 +1,7 @@
 #pragma once
-#include "Core/Vector2.h"
+#include <array>
 #include <vector>
+#include "Core/Core.h"
 
 namespace umbra
 {

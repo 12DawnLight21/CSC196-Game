@@ -2,6 +2,7 @@
 #include "Core/Core.h" //linked to a bunch of directories
 #include "Renderer/Model.h"
 #include "Input/InputSystem.h"
+#include <thread>
 #include <iostream> //searches the system instead
 #include <vector>
 using namespace std;
@@ -16,7 +17,7 @@ public:
 
 	void Update()
 	{
-		m_pos += m_vel;
+		m_pos += m_vel * umbra::g_time.GetDeltaTime();
 	}
 
 	void Draw(umbra::Renderer& renderer)
@@ -45,8 +46,8 @@ void funcs() //will crash your shit with a stack overflow
 
 int main(int argc, char* argv[])
 {
-	
 	umbra::seedRandom((unsigned int)time(nullptr));
+	umbra::setFilePath("assets");
 	
 	//our window setup
 	umbra::Renderer renderer;
@@ -58,23 +59,12 @@ int main(int argc, char* argv[])
 
 	bool quit = false;
 
-	while (!quit) 
-	{
-		inputSystem.Update();
-		if (inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE))
-		{
-			quit = true;
-		}
-
-
-	}
-
-
-
-
 	//triangle time
-	std::vector<umbra::vec2> points{ {-10, 5}, { 10, 5 }, { -10, -5 }, {-10, 5} }; //initializer list, dont need to specify vec2 cause it already knows
-	umbra::Model model(points);  
+	//std::vector<umbra::vec2> points{ {-10, 5}, { 10, 5 }, { -10, -5 }, {-10, 5} }; //initializer list, dont need to specify vec2 cause it already knows
+	umbra::Model model;  
+	model.Load("ship.txt"); //could also be assets/ship.txt
+	
+
 	umbra::vec2 v{5, 5};
 	v.Normalize();
 
@@ -90,12 +80,35 @@ int main(int argc, char* argv[])
 		stars.push_back(Star(pos, vel));
 	}
 
-	while (true)
+	umbra::vec2 position{400, 300}; //could also use ()
+	float speed = 200; //pixels per second
+
+	// Main GAME LOOP
+	while (!quit)
 	{
+		umbra::g_time.Tick();
+		inputSystem.Update(); //checks for input updates 
+		if (inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE)) //if esc is pressed, end the thing
+		{
+			quit = true;
+		}
+		umbra::vec2 direction;
+		if (inputSystem.getKeyDown(SDL_SCANCODE_W)) direction.y = -1;
+		if (inputSystem.getKeyDown(SDL_SCANCODE_S)) direction.y = 1;
+		if (inputSystem.getKeyDown(SDL_SCANCODE_A)) direction.x = -1;
+		if (inputSystem.getKeyDown(SDL_SCANCODE_D)) direction.x = 1;
+
+		position += direction * speed * umbra::g_time.GetDeltaTime();
+
+		if (inputSystem.GetMouseButtonDown(0)) //if mouse clicked, clicked the mouse
+		{
+			cout << "Mouse pressed." << endl;
+		}
+
 		renderer.SetColor(0, 0, 0, 0); //sets color to black
 		renderer.BeginFrame(); //clears the screen, allows for less static
-		//draw
 
+		//draw stars
 		for (auto& star : stars) //literally just made space screensaver
 		{
 			star.Update();
@@ -106,8 +119,9 @@ int main(int argc, char* argv[])
 			renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
 		}
 
-		model.Draw(renderer, {400, 300}, 25.6);
+		model.Draw(renderer, position, 4.8f);
 
+		//cout << inputSystem.GetMousePosition().x << ", " << inputSystem.GetMousePosition().y << endl; //constantly spits out mouse position
 		/*
 		for (int i = 0; i < 1000; i++)
 		{
@@ -127,7 +141,7 @@ int main(int argc, char* argv[])
 		renderer.EndFrame();
 	}
 
-	return 0;
+	return 0; 
 }
 
 	//umbra::CreateWindow("CSC196", 800, 600);

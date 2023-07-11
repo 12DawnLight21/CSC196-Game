@@ -9,8 +9,9 @@ namespace umbra
 	{
 	public:
 		Model() = default;
-		Model(const std::vector<vec2>& points) : m_points{ points } {}; //if you dont use a reference, itll copy over the number which is SLOW
+		Model(const std::vector<vec2>& points) : m_points{ points } {}; //if you dont use a reference, itll copy over the numbers which is SLOW
 
+		bool Load(const std::string& filename);
 		void Draw(Renderer& renderer, const vec2& position, float scale);
 
 	private:
