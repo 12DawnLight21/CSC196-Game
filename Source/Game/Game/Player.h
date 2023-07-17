@@ -1,7 +1,7 @@
 #pragma once
-#include "Actor.h"
+#include "Framework/Actor.h"
 
-class Player : public Actor
+class Player : public umbra::Actor
 {
 public:
 	Player(float speed, float turnRate, const umbra::Transform transform, const umbra::Model model) :

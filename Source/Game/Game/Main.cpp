@@ -3,6 +3,7 @@
 #include "Renderer/Model.h"
 #include "Input/InputSystem.h"
 #include "Audio/AudioSystem.h"
+#include "Framework/Scene.h"
 #include "Player.h"
 #include "Enemy.h"
 
@@ -59,12 +60,13 @@ int main(int argc, char* argv[])
 
 	umbra::g_inputSystem.Initialize();
 
-	umbra::AudioSystem audioSystem;
-	audioSystem.Initialize();
-	audioSystem.AddAudio("shoot", "shoot.wav");
+	umbra::g_audioSystem.Initialize();
+	umbra::g_audioSystem.AddAudio("shoot", "shoot.wav"); //instead of using shoot.wav, we can just call shoot
 
 	umbra::Model model;
+	umbra::Model model2;
 	model.Load("ship.txt"); //could also be assets/ship.txt
+	model2.Load("enemy.txt");
 
 	umbra::vec2 v{5, 5};
 	v.Normalize();
@@ -79,18 +81,13 @@ int main(int argc, char* argv[])
 		stars.push_back(Star(pos, vel));
 	}
 
-	umbra::Transform transform({ 400, 300 }, 0, 3);
-	float speed = 200; //pixels per second
-	constexpr float turnRate = umbra::DegToRad(180);
-
-	Player player{200, umbra::Pi, { {400, 300}, 0, 6 }, model };
-	std::vector<Enemy> enemies;
+	umbra::Scene scene;
+	scene.Add(new Player{ 200, umbra::Pi, { {400, 300}, 0, 6 }, model }); //creates player in main part of memory
 	for (int i = 0; i < 100; i++)
 	{
-		Enemy enemy{ 300, umbra::Pi, { {umbra::random(umbra::g_renderer.GetWidth()), umbra::random(umbra::g_renderer.GetHeight())}, umbra::randomf(umbra::TwoPi), 4}, model};
-		enemies.push_back(enemy);
+		Enemy* enemy = new Enemy{ 300, umbra::Pi, { {umbra::random(umbra::g_renderer.GetWidth()), umbra::random(umbra::g_renderer.GetHeight())}, umbra::randomf(umbra::TwoPi), 4}, model2};
+		scene.Add(enemy);
 	}
-
 
 	bool quit = false;
 	// Main GAME LOOP
@@ -99,12 +96,10 @@ int main(int argc, char* argv[])
 		//update engine
 		umbra::g_time.Tick();
 		umbra::g_inputSystem.Update(); //checks for input updates 
-		audioSystem.Update(); //updates the audio systems
+		umbra::g_audioSystem.Update(); //updates the audio systems
 
 		//update game
-		player.Update(umbra::g_time.GetDeltaTime());
-		for (auto& enemy : enemies) enemy.Update(umbra::g_time.GetDeltaTime());
-
+		scene.Update(umbra::g_time.GetDeltaTime());
 
 		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE)) //if esc is pressed, end the thing
 		{
@@ -115,9 +110,11 @@ int main(int argc, char* argv[])
 		{
 			cout << "Mouse pressed." << endl;
 		}
-		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_SPACE))
+
+
+		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_M))
 		{
-			audioSystem.PlayOneShot("shoot");
+			umbra::g_audioSystem.PlayOneShot("shoot");
 		}
 
 		//update draw
@@ -134,12 +131,7 @@ int main(int argc, char* argv[])
 			umbra::g_renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
 		}
 		
-		player.Draw(umbra::g_renderer);
-		for (auto& enemy : enemies)
-		{
-			umbra::g_renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
-			enemy.Draw(umbra::g_renderer);
-		}
+		scene.Draw(umbra::g_renderer);
 
 		//model.Draw(umbra::g_renderer, transform.position, transform.rotation, transform.scale);
 
@@ -165,6 +157,13 @@ int main(int argc, char* argv[])
 
 	return 0; 
 }
+
+
+// taxi game??
+// chaos simulator (youre shadow the hedgehog. enough said)
+	//shadow the ehdgehog game but lines and its way better
+// replicate that penguin asteroids game you saw on that one youtube channel
+// legend of zelda with OG sword mechanics? 
 
 	
 	/*
