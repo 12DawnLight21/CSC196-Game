@@ -36,4 +36,6 @@ namespace umbra
 			SDL_Window* m_window{ nullptr };
 			
 	};
+
+	extern Renderer g_renderer;
 }

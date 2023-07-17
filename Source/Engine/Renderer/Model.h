@@ -12,7 +12,8 @@ namespace umbra
 		Model(const std::vector<vec2>& points) : m_points{ points } {}; //if you dont use a reference, itll copy over the numbers which is SLOW
 
 		bool Load(const std::string& filename);
-		void Draw(Renderer& renderer, const vec2& position, float scale);
+		void Draw(Renderer& renderer, const vec2& position, float rotation, float scale);
+		void Draw(Renderer& renderer, const Transform& transform);
 
 	private:
 		std::vector<vec2> m_points; //hidden array of points ; vec2 = Vector2 alias

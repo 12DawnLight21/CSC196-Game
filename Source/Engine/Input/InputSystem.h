@@ -32,4 +32,6 @@ namespace umbra
 		std::array<uint8_t, 3> m_mouseButtonState; //maple has these as arrays but making them vectors made the red go away lol
 		std::array<uint8_t, 3> m_prevMouseButtonState;
 	};
+
+	extern InputSystem g_inputSystem;
 }

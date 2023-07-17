@@ -3,6 +3,8 @@
 
 namespace umbra
 {
+	InputSystem g_inputSystem;
+
 	bool InputSystem::Initialize()
 	{
 		int numKeys = 0;

@@ -20,24 +20,28 @@ namespace umbra
 
 			stream >> point;
 
-			m_points.push_back(point); //assigns point to vec even tho theres no data
+			m_points.push_back(point); //assigns point to vec even tho there's no data
 		}
 
 		return true;
 	}
-	void Model::Draw(Renderer& renderer, const vec2& position, float scale)
+	void Model::Draw(Renderer& renderer, const vec2& position, float rotation, float scale)
 	{
 		if (m_points.empty()) return; //if there's no points, don't draw
 
 		for (int i = 0; i < m_points.size() - 1; i++) //prevents me from going outside the index
 		{
 
-			vec2 p1 = (m_points[i] * scale) + position;
-			vec2 p2 = (m_points[i + 1] * scale) + position;
+			vec2 p1 = (m_points[i] * scale).Rotate(rotation) + position; //we scale along the origin, then rotate, then place
+			vec2 p2 = (m_points[i + 1] * scale).Rotate(rotation) + position;
 			
 			renderer.DrawLine(p1.x, p1.y, p2.x, p2.y);
 		}
 
 		
+	}
+	void Model::Draw(Renderer& renderer, const Transform& transform)
+	{
+		Draw(renderer, transform.position, transform.rotation, transform.scale);
 	}
 }

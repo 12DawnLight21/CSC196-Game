@@ -2,6 +2,10 @@
 #include "Core/Core.h" //linked to a bunch of directories
 #include "Renderer/Model.h"
 #include "Input/InputSystem.h"
+#include "Audio/AudioSystem.h"
+#include "Player.h"
+#include "Enemy.h"
+
 #include <thread>
 #include <iostream> //searches the system instead
 #include <vector>
@@ -48,78 +52,96 @@ int main(int argc, char* argv[])
 {
 	umbra::seedRandom((unsigned int)time(nullptr));
 	umbra::setFilePath("assets");
-	
+
 	//our window setup
-	umbra::Renderer renderer;
-	renderer.Initialize();
-	renderer.CreateWindow("CSC196", 800, 600);
+	umbra::g_renderer.Initialize();
+	umbra::g_renderer.CreateWindow("CSC196", 800, 600);
 
-	umbra::InputSystem inputSystem;
-	inputSystem.Initialize();
+	umbra::g_inputSystem.Initialize();
 
-	bool quit = false;
+	umbra::AudioSystem audioSystem;
+	audioSystem.Initialize();
+	audioSystem.AddAudio("shoot", "shoot.wav");
 
-	//triangle time
-	//std::vector<umbra::vec2> points{ {-10, 5}, { 10, 5 }, { -10, -5 }, {-10, 5} }; //initializer list, dont need to specify vec2 cause it already knows
-	umbra::Model model;  
+	umbra::Model model;
 	model.Load("ship.txt"); //could also be assets/ship.txt
-	
 
 	umbra::vec2 v{5, 5};
 	v.Normalize();
 
-
-	//vector<umbra::Vector2> points; //an array of values
 	vector<Star> stars; //not in a namespace so its fine
 
 	for (int i = 0; i < 1000; i++)
 	{
-		umbra::Vector2 pos(umbra::Vector2(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight())));
+		umbra::Vector2 pos(umbra::Vector2(umbra::random(umbra::g_renderer.GetWidth()), umbra::random(umbra::g_renderer.GetHeight())));
 		umbra::Vector2 vel(umbra::randomf(0.7f, 4), 0.0f);
 
 		stars.push_back(Star(pos, vel));
 	}
 
-	umbra::vec2 position{400, 300}; //could also use ()
+	umbra::Transform transform({ 400, 300 }, 0, 3);
 	float speed = 200; //pixels per second
+	constexpr float turnRate = umbra::DegToRad(180);
 
+	Player player{200, umbra::Pi, { {400, 300}, 0, 6 }, model };
+	std::vector<Enemy> enemies;
+	for (int i = 0; i < 100; i++)
+	{
+		Enemy enemy{ 300, umbra::Pi, { {umbra::random(umbra::g_renderer.GetWidth()), umbra::random(umbra::g_renderer.GetHeight())}, umbra::randomf(umbra::TwoPi), 4}, model};
+		enemies.push_back(enemy);
+	}
+
+
+	bool quit = false;
 	// Main GAME LOOP
 	while (!quit)
 	{
+		//update engine
 		umbra::g_time.Tick();
-		inputSystem.Update(); //checks for input updates 
-		if (inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE)) //if esc is pressed, end the thing
+		umbra::g_inputSystem.Update(); //checks for input updates 
+		audioSystem.Update(); //updates the audio systems
+
+		//update game
+		player.Update(umbra::g_time.GetDeltaTime());
+		for (auto& enemy : enemies) enemy.Update(umbra::g_time.GetDeltaTime());
+
+
+		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE)) //if esc is pressed, end the thing
 		{
 			quit = true;
 		}
-		umbra::vec2 direction;
-		if (inputSystem.getKeyDown(SDL_SCANCODE_W)) direction.y = -1;
-		if (inputSystem.getKeyDown(SDL_SCANCODE_S)) direction.y = 1;
-		if (inputSystem.getKeyDown(SDL_SCANCODE_A)) direction.x = -1;
-		if (inputSystem.getKeyDown(SDL_SCANCODE_D)) direction.x = 1;
 
-		position += direction * speed * umbra::g_time.GetDeltaTime();
-
-		if (inputSystem.GetMouseButtonDown(0)) //if mouse clicked, clicked the mouse
+		if (umbra::g_inputSystem.GetMouseButtonDown(0)) //if mouse clicked, clicked the mouse
 		{
 			cout << "Mouse pressed." << endl;
 		}
+		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_SPACE))
+		{
+			audioSystem.PlayOneShot("shoot");
+		}
 
-		renderer.SetColor(0, 0, 0, 0); //sets color to black
-		renderer.BeginFrame(); //clears the screen, allows for less static
+		//update draw
+		umbra::g_renderer.SetColor(0, 0, 0, 0); //sets color to black
+		umbra::g_renderer.BeginFrame(); //clears the screen, allows for less static
 
-		//draw stars
 		for (auto& star : stars) //literally just made space screensaver
 		{
 			star.Update();
 
-			if (star.m_pos.x >= renderer.GetWidth()) star.m_pos.x = 0;
-			if (star.m_pos.y >= renderer.GetHeight()) star.m_pos.y = 0;
-			renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
-			renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
+			if (star.m_pos.x >= umbra::g_renderer.GetWidth()) star.m_pos.x = 0;
+			if (star.m_pos.y >= umbra::g_renderer.GetHeight()) star.m_pos.y = 0;
+			umbra::g_renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
+			umbra::g_renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
+		}
+		
+		player.Draw(umbra::g_renderer);
+		for (auto& enemy : enemies)
+		{
+			umbra::g_renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
+			enemy.Draw(umbra::g_renderer);
 		}
 
-		model.Draw(renderer, position, 4.8f);
+		//model.Draw(umbra::g_renderer, transform.position, transform.rotation, transform.scale);
 
 		//cout << inputSystem.GetMousePosition().x << ", " << inputSystem.GetMousePosition().y << endl; //constantly spits out mouse position
 		/*
@@ -138,51 +160,40 @@ int main(int argc, char* argv[])
 		}
 		*/
 
-		renderer.EndFrame();
+		umbra::g_renderer.EndFrame();
 	}
 
 	return 0; 
 }
 
-	//umbra::CreateWindow("CSC196", 800, 600);
-	//cin.get(); // is a pause, prevents window from opening/closing too fast
 	
 	/*
+	//umbra::CreateWindow("CSC196", 800, 600);
+	//cin.get(); // is a pause, prevents window from opening/closing too fast
 	//memory time fellas
 	umbra::g_memoryTracker.DisplayInfo();
 	int* p = new int; //holds the ADDRESS of an int
 	umbra::g_memoryTracker.DisplayInfo();
 	delete p;
 	umbra::g_memoryTracker.DisplayInfo();
-
 	umbra::Time timer;
 	for (int i = 0; i < 10000000000000000000; i++) {}
 	cout << timer.GetElapsedSeconds() << endl;
-	*/
-
 	//chrono time, literally	
 	//auto start = std::chrono::high_resolution_clock::now(); //auto - figures out the datatype by the code assignment
 	//for (int i = 0; i < 10000000000000000000; i++) {}
 	//auto end = std::chrono::high_resolution_clock::now();
 	//cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() << endl; //<casts> it into microsecodns
-
-	/*
 	cout << umbra::getFilePath() << endl;
 	umbra::setFilePath("Assets"); //not case sensitive
 	cout << umbra::getFilePath() << endl;
-
 	size_t size;
 	umbra::getFileSize("game.txt", size);
 	cout << size << endl;
-
 	std::string s;
 	umbra::readFile("game.txt", s);
 	cout << s << endl;
-	*/
-
 	// ../ goes back a SINGLE directory, can nagivate the entire directory
-
-	/*
 	umbra::seedRandom((unsigned int)time(nullptr)); //returns system time in seconds starting // () is a cast
 	for (int i = 0; i < 10; i++)
 	{
