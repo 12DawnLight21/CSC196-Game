@@ -2,6 +2,7 @@
 #include "Projectile.h"
 #include "Framework/Scene.h"
 #include "Input/InputSystem.h"
+#include "Renderer/Renderer.h"
 
 void Player::Update(float dt)
 {
@@ -21,13 +22,13 @@ void Player::Update(float dt)
 	m_transform.position.y = umbra::Wrap(m_transform.position.y, (float)umbra::g_renderer.GetHeight());
 
 	//fire projectiles
-	if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_SPACE) && 
-		!umbra::g_inputSystem.getPreviousKeyDown(SDL_SCANCODE_SPACE))
+	if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_SPACE) && !umbra::g_inputSystem.getPreviousKeyDown(SDL_SCANCODE_SPACE))
 	{
 		//create weapon
-		umbra::Transform transform{ m_transform.position, m_transform.rotation, 1.0f}; //changes bullet size
-		Projectile* projectile = new Projectile{400, transform, m_model};
-		m_scene->Add(projectile);
+		umbra::Transform transform{ m_transform.position, m_transform.rotation, 1}; //changes bullet size
+		std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>( 400.0f, transform, m_model );
+
+		m_scene->Add(std::move(projectile));
 	}
 
 }

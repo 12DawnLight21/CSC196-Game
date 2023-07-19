@@ -3,7 +3,7 @@
 
 namespace umbra
 {
-	constexpr float Pi = 3.14159265359; //a constant expression that can be evaluated at run/compile time
+	constexpr float Pi = 3.14159265359f; //a constant expression that can be evaluated at run/compile time
 	constexpr float TwoPi = 6.28318530718f;
 	constexpr float HalfPi = 1.57079632679f;
 

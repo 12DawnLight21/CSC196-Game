@@ -8,7 +8,7 @@ namespace umbra
 	public:
 		vec2 position;
 		float rotation = 0;
-		float scale = 1;
+		float scale = 1.0f;
 
 	public:
 		Transform() = default;

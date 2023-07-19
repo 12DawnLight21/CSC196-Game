@@ -11,13 +11,19 @@ namespace umbra
 			m_transform{ transform },
 			m_model{ model } {};
 
-		virtual void Update(float dt) = 0; //dt = delta time
+		virtual void Update(float dt); //dt = delta time
 		virtual void Draw(umbra::Renderer& renderer);
 
-		class Scene* m_scene; //inline forward declaration
+		class Scene* m_scene = nullptr; //inline forward declaration
+		friend class Scene;
+
+		//BAD CODE BAD MAPLE >:3
+		umbra::Transform m_transform;
 
 	protected:
-		umbra::Transform m_transform;
+		bool m_destroyed = false; //a flag
+		float m_lifespan = -1.0f;
+
 		umbra::Model m_model;
 	};
 }

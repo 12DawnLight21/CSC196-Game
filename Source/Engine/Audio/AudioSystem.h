@@ -24,6 +24,8 @@ namespace umbra
 		std::map<std::string, FMOD::Sound*> m_sounds;
 
 	};
+
+	void f();
 	
 	extern AudioSystem g_audioSystem;
 }

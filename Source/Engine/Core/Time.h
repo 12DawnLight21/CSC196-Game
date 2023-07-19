@@ -28,8 +28,8 @@ namespace umbra
 		float GetDeltaTime() const { return m_deltaTime; };
 
 	private:
-		float m_time;
-		float m_deltaTime;
+		float m_time = 1.0f;
+		float m_deltaTime = 1.0f;
 
 		clock::time_point m_startTime;
 		clock::time_point m_frameTime;

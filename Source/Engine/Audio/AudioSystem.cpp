@@ -3,6 +3,11 @@ namespace umbra
 {
 	AudioSystem g_audioSystem;
 
+	void f()
+	{
+		//empty
+	}
+
 	bool AudioSystem::Initialize()
 	{
 		FMOD::System_Create(&m_fmodSystem);

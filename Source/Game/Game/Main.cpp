@@ -1,15 +1,16 @@
-#include "Renderer/Renderer.h"
 #include "Core/Core.h" //linked to a bunch of directories
+#include "Renderer/Renderer.h"
 #include "Renderer/Model.h"
 #include "Input/InputSystem.h"
-#include "Audio/AudioSystem.h"
 #include "Framework/Scene.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "Audio/AudioSystem.h"
 
 #include <thread>
 #include <iostream> //searches the system instead
 #include <vector>
+
 using namespace std;
 
 class Star
@@ -51,8 +52,13 @@ void funcs() //will crash your shit with a stack overflow
 
 int main(int argc, char* argv[])
 {
+	umbra::MemoryTracker::Initialize();
+
 	umbra::seedRandom((unsigned int)time(nullptr));
 	umbra::setFilePath("assets");
+
+	int* p = new int;
+	//delete p;
 
 	//our window setup
 	umbra::g_renderer.Initialize();
@@ -63,33 +69,36 @@ int main(int argc, char* argv[])
 	umbra::g_audioSystem.Initialize();
 	umbra::g_audioSystem.AddAudio("shoot", "shoot.wav"); //instead of using shoot.wav, we can just call shoot
 
+
 	umbra::Model model;
-	umbra::Model model2;
 	model.Load("ship.txt"); //could also be assets/ship.txt
-	model2.Load("enemy.txt");
 
 	umbra::vec2 v{5, 5};
 	v.Normalize();
 
 	vector<Star> stars; //not in a namespace so its fine
-
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 500; i++) //makes the star background ;3
 	{
 		umbra::Vector2 pos(umbra::Vector2(umbra::random(umbra::g_renderer.GetWidth()), umbra::random(umbra::g_renderer.GetHeight())));
-		umbra::Vector2 vel(umbra::randomf(0.7f, 4), 0.0f);
+		umbra::Vector2 vel(umbra::randomf(1, 8), 0.0f);
 
 		stars.push_back(Star(pos, vel));
 	}
 
 	umbra::Scene scene;
-	scene.Add(new Player{ 200, umbra::Pi, { {400, 300}, 0, 6 }, model }); //creates player in main part of memory
-	for (int i = 0; i < 100; i++)
+	std::unique_ptr<Player> player = make_unique<Player>(200.0f, umbra::Pi, umbra::Transform{ {400, 300}, 0, 6 }, model);
+
+	scene.Add(std::move(player)); //creates player in main part of memory
+	for (int i = 0; i < 10; i++)
 	{
-		Enemy* enemy = new Enemy{ 300, umbra::Pi, { {umbra::random(umbra::g_renderer.GetWidth()), umbra::random(umbra::g_renderer.GetHeight())}, umbra::randomf(umbra::TwoPi), 4}, model2};
-		scene.Add(enemy);
+		std::unique_ptr<Enemy> enemy = make_unique<Enemy>(umbra::randomf(75.0f, 150.0f), umbra::Pi, umbra::Transform{ { umbra::random(800), umbra::random(600)}, umbra::randomf(umbra::TwoPi), 6 }, model);
+		scene.Add(std::move(enemy));
 	}
 
+
+
 	bool quit = false;
+
 	// Main GAME LOOP
 	while (!quit)
 	{
@@ -100,6 +109,9 @@ int main(int argc, char* argv[])
 
 		//update game
 		scene.Update(umbra::g_time.GetDeltaTime());
+		umbra::g_renderer.SetColor(0, 0, 0, 0); //sets color to black
+		umbra::g_renderer.BeginFrame(); //clears the screen, allows for less static
+
 
 		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE)) //if esc is pressed, end the thing
 		{
@@ -111,15 +123,14 @@ int main(int argc, char* argv[])
 			cout << "Mouse pressed." << endl;
 		}
 
-
 		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_M))
 		{
 			umbra::g_audioSystem.PlayOneShot("shoot");
 		}
 
 		//update draw
-		umbra::g_renderer.SetColor(0, 0, 0, 0); //sets color to black
-		umbra::g_renderer.BeginFrame(); //clears the screen, allows for less static
+		
+		umbra::Vector2 vel(1.0f, 0.3f);
 
 		for (auto& star : stars) //literally just made space screensaver
 		{
@@ -127,7 +138,8 @@ int main(int argc, char* argv[])
 
 			if (star.m_pos.x >= umbra::g_renderer.GetWidth()) star.m_pos.x = 0;
 			if (star.m_pos.y >= umbra::g_renderer.GetHeight()) star.m_pos.y = 0;
-			umbra::g_renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255);
+
+			umbra::g_renderer.SetColor(umbra::random(256), umbra::random(256), umbra::random(256), 255);
 			umbra::g_renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
 		}
 		
@@ -154,6 +166,9 @@ int main(int argc, char* argv[])
 
 		umbra::g_renderer.EndFrame();
 	}
+
+	stars.clear();
+	scene.RemoveAll();
 
 	return 0; 
 }

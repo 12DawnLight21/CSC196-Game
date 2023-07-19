@@ -1,28 +1,21 @@
 #pragma once
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#include <memory>
+
+#ifdef _DEBUG
+#define DEBUG_NEW   new( _CLIENT_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
+#endif // _DEBUG
 
 namespace umbra
 {
-	struct MemoryAllocation //like a class but stores a data structure
+	class MemoryTracker
 	{
-		void* address;
-		size_t size;
-		MemoryAllocation* next;
+	public:
+		static bool Initialize();
+		static void DisplayInfo();
 	};
-
-	
-	class MemoryTracker //tracks memory that's been allocated
-	{
-		public:
-			void Add(void* address, size_t size); //adds allocation to the list
-			void Remove(void* address, size_t size);
-
-			void DisplayInfo();
-
-		private:
-			size_t m_bytesAllocated = 0; //member variables have m_ in the class // helps prevent confusion
-			size_t m_numAllocations = 0; //number of allocations
- 	};
-	
-	extern MemoryTracker g_memoryTracker;
 }

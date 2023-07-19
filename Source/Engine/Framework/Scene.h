@@ -18,11 +18,27 @@ namespace umbra
 		void Update(float dt);
 		void Draw(Renderer& renderer);
 
-		void Add(Actor* actor);
-		void Remove(Actor* actor);
+		void Add(std::unique_ptr<Actor> actor);
 		void RemoveAll();
 
+		template<typename T>
+		T* GetActor();
+
+		friend class Actor;
+
 	private:
-		std::list<Actor*> m_actors; //contains POINTER of actors, more optimal for constantly changing
+		std::list<std::unique_ptr<Actor>> m_actors; //contains POINTER of actors, more optimal for constantly changing
 	};
+
+	template<typename T>
+	inline T* Scene::GetActor()
+	{
+		for (auto& actor : m_actors) //if unique_ptr, MUST be reference!
+		{
+			T* result = dynamic_cast<T*>(actor.get()); //goes through every actor and returns the one we specify
+			if (result) return result;
+		}
+
+		return nullptr;
+	}
 }

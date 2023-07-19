@@ -17,7 +17,7 @@ namespace umbra
 	}
 	void InputSystem::Shutdown()
 	{
-		//
+		//empty
 	}
 	void InputSystem::Update()
 	{
@@ -25,11 +25,13 @@ namespace umbra
 		SDL_Event event;
 		SDL_PollEvent(&event);
 
+		//keyboard things
 		m_prevKeyboardState = m_keyboardState; //saves prev state
 
 		const uint8_t* keyboardState = SDL_GetKeyboardState(nullptr); //gets sdl keyboard state 
 		std::copy(keyboardState, keyboardState + m_keyboardState.size(), m_keyboardState.begin()); //copy sdl state to input system keybaord state
 
+		//mouse things
 		int x, y;
 		uint32_t buttons = SDL_GetMouseState(&x, &y);
 		m_mousePosition = Vector2{ x, y };
