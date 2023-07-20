@@ -28,6 +28,8 @@ namespace umbra
 			int GetWidth() const { return m_width; } //returns copy of the value
 			int GetHeight() const { return m_height; } //does NOT change value of private variables
 
+			friend class Text;
+
 		private:
 			int m_width = 0;
 			int m_height = 0;

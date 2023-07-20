@@ -5,7 +5,7 @@
 class Projectile : public umbra::Actor
 {
 public:
-	Projectile(float speed, const umbra::Transform transform, const umbra::Model model) :
+	Projectile(float speed, const umbra::Transform transform, const std::shared_ptr<umbra::Model> model) :
 		Actor{ transform, model },
 		m_speed{ speed } 
 	{
@@ -14,6 +14,8 @@ public:
 
 	void Update(float dt) override;
 	//void PlaySound(umbra::AudioSystem audio);
+
+	void OnCollision(Actor* other) override;
 
 private:
 	float m_speed = 0;

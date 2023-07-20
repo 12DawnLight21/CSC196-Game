@@ -6,7 +6,7 @@
 
 namespace umbra
 {
-	bool Model::Load(const std::string filename)
+	bool Model::Load(const std::string& filename)
 	{
 		std::string buffer; //fancy name for block of data
 		umbra::readFile(filename, buffer);
@@ -57,5 +57,17 @@ namespace umbra
 	void Model::Draw(Renderer& renderer, const Transform& transform)
 	{
 		Draw(renderer, transform.position, transform.rotation, transform.scale);
+	}
+	float Model::GetRadius()
+	{
+		if (m_radius) return m_radius;
+
+		for (auto point : m_points)
+		{
+			float length = point.Length();
+			m_radius = Max(m_radius, length); //radius = highest value from points
+		}
+
+		return m_radius;
 	}
 }

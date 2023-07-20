@@ -31,11 +31,23 @@ void Enemy::Update(float dt)
 		//create weapon
 		umbra::Transform transform{ m_transform.position, m_transform.rotation, 1}; //changes bullet size
 		std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>(400.0f, transform, m_model);
+		projectile->m_tag = "EnemyBullet";
 
 		m_scene->Add(std::move(projectile));
 	}
 	else
 	{
 		m_fireTimer -= dt;
+	}
+}
+
+void Enemy::OnCollision(Actor* other)
+{
+	//dynamic_cast<Player*>(other) returns a player or null
+
+	if (other->m_tag == "PlayerBullet")
+	{
+		m_health -= m_health;
+		if (m_health <= 0) m_destroyed = true;
 	}
 }

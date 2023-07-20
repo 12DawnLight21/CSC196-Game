@@ -4,15 +4,20 @@
 class Player : public umbra::Actor
 {
 public:
-	Player(float speed, float turnRate, const umbra::Transform transform, const umbra::Model model) :
+	Player(float speed, float turnRate, const umbra::Transform transform, const std::shared_ptr<umbra::Model> model) :
 		Actor{ transform, model },
 		m_speed{speed},
 		m_turnRate{turnRate}
 	{};
 
 	void Update(float dt) override;
+	void OnCollision(Actor* other) override;
+
 
 private:
 	float m_speed = 0;
 	float m_turnRate = 0;
+
+	float m_health = 200;
+	float m_damage = 10;
 };

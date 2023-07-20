@@ -1,8 +1,10 @@
 #pragma once
+#include "MathUtils.h"
+
 #include <cstdint>
 #include <string>
+#include<iostream>
 
-#include "MathUtils.h"
 namespace umbra
 {
     class Color
@@ -15,6 +17,8 @@ namespace umbra
 
         static uint8_t ToInt(float c) { return static_cast<uint8_t>(Clamp(c, 0.0f, 1.0f) * 255); }
 
+        //friend std::istream& operator >> (std::istream& stream, Color& color);
+
     };
     inline std::istream& operator >> (std::istream& stream, Color& color)
     {
@@ -25,12 +29,10 @@ namespace umbra
 
         color.r = std::stof(str);
 
-        //line = line.substr(line.find("," + 1));
         str = str.substr(str.find(",") + 1);
         color.g = std::stof(str);
 
         //blue
-        //str = line.substr(line.find(",") + 1, line.find("}") - line.find(",") - 1);
         str = str.substr(str.find(",") + 1);
         color.b = std::stof(str);
 

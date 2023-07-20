@@ -1,11 +1,13 @@
 #include "Core/Core.h" //linked to a bunch of directories
 #include "Renderer/Renderer.h"
-#include "Renderer/Model.h"
+#include "Renderer/ModelManager.h"
 #include "Input/InputSystem.h"
 #include "Framework/Scene.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Audio/AudioSystem.h"
+#include "Renderer/Font.h"
+#include "Renderer/Text.h"
 
 #include <thread>
 #include <iostream> //searches the system instead
@@ -69,10 +71,6 @@ int main(int argc, char* argv[])
 	umbra::g_audioSystem.Initialize();
 	umbra::g_audioSystem.AddAudio("shoot", "shoot.wav"); //instead of using shoot.wav, we can just call shoot
 
-
-	umbra::Model model;
-	model.Load("ship.txt"); //could also be assets/ship.txt
-
 	umbra::vec2 v{5, 5};
 	v.Normalize();
 
@@ -86,19 +84,25 @@ int main(int argc, char* argv[])
 	}
 
 	umbra::Scene scene;
-	std::unique_ptr<Player> player = make_unique<Player>(200.0f, umbra::Pi, umbra::Transform{ {400, 300}, 0, 6 }, model);
-
+	std::unique_ptr<Player> player = make_unique<Player>(200.0f, umbra::Pi, umbra::Transform{ {400, 300}, 0, 6 }, umbra::g_manager.Get("player.txt"));
+	player->m_tag = "Player";
 	scene.Add(std::move(player)); //creates player in main part of memory
+
 	for (int i = 0; i < 10; i++)
 	{
-		std::unique_ptr<Enemy> enemy = make_unique<Enemy>(umbra::randomf(75.0f, 150.0f), umbra::Pi, umbra::Transform{ { umbra::random(800), umbra::random(600)}, umbra::randomf(umbra::TwoPi), 6 }, model);
+		std::unique_ptr<Enemy> enemy = make_unique<Enemy>(umbra::randomf(75.0f, 150.0f), umbra::Pi, umbra::Transform{ { umbra::random(800), umbra::random(600)}, umbra::randomf(umbra::TwoPi), 6 }, umbra::g_manager.Get("ship.txt"));
+		enemy->m_tag = "Enemy";
 		scene.Add(std::move(enemy));
 	}
 
+	//create font / text objects
+	std::shared_ptr<umbra::Font> font = std::make_shared<umbra::Font>("MinecraftRegular.ttf", 24);
+
+	std::unique_ptr<umbra::Text> text = std::make_unique<umbra::Text>(font);
+	text->Create(umbra::g_renderer, "NEUMONT", umbra::Color{1, 1, 1, 1});
 
 
 	bool quit = false;
-
 	// Main GAME LOOP
 	while (!quit)
 	{
@@ -129,7 +133,6 @@ int main(int argc, char* argv[])
 		}
 
 		//update draw
-		
 		umbra::Vector2 vel(1.0f, 0.3f);
 
 		for (auto& star : stars) //literally just made space screensaver
@@ -144,25 +147,7 @@ int main(int argc, char* argv[])
 		}
 		
 		scene.Draw(umbra::g_renderer);
-
-		//model.Draw(umbra::g_renderer, transform.position, transform.rotation, transform.scale);
-
-		//cout << inputSystem.GetMousePosition().x << ", " << inputSystem.GetMousePosition().y << endl; //constantly spits out mouse position
-		/*
-		for (int i = 0; i < 1000; i++)
-		{
-			umbra::Vector2 pos(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()));
-
-			renderer.SetColor(umbra::random(256), umbra::random(256), 150, 255); //sets a random color BEFORE its drawn
-			renderer.DrawPoint(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()));
-			//renderer.DrawLine(umbra::random(renderer.GetWidth()), umbra::random(renderer.GetHeight()), renderer.GetWidth(), umbra::random(renderer.GetHeight()));
-		}
-
-		for (int i = 0; i < 10; i++)
-		{
-			
-		}
-		*/
+		text->Draw(umbra::g_renderer, 400, 300);
 
 		umbra::g_renderer.EndFrame();
 	}
@@ -174,11 +159,13 @@ int main(int argc, char* argv[])
 }
 
 
+
 // taxi game??
 // chaos simulator (youre shadow the hedgehog. enough said)
 	//shadow the ehdgehog game but lines and its way better
 // replicate that penguin asteroids game you saw on that one youtube channel
 // legend of zelda with OG sword mechanics? 
+
 
 	
 	/*

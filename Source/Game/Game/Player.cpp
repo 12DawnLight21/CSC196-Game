@@ -25,10 +25,25 @@ void Player::Update(float dt)
 	if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_SPACE) && !umbra::g_inputSystem.getPreviousKeyDown(SDL_SCANCODE_SPACE))
 	{
 		//create weapon
-		umbra::Transform transform{ m_transform.position, m_transform.rotation, 1}; //changes bullet size
+		umbra::Transform transform{ m_transform.position, m_transform.rotation, 1.0f}; //changes bullet size
 		std::unique_ptr<Projectile> projectile = std::make_unique<Projectile>( 400.0f, transform, m_model );
+		projectile->m_tag = "PlayerBullet";
 
 		m_scene->Add(std::move(projectile));
 	}
 
+}
+
+void Player::OnCollision(Actor* other)
+{
+	if (other->m_tag == "EnemyBullet")
+	{
+		m_health - m_damage;
+		if (m_health <= 0) m_destroyed = true;
+	}
+
+	/*if (other->m_tag = "Powerup")
+	{
+		m_health = 100;
+	}*/
 }
