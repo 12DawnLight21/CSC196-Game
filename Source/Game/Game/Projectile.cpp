@@ -11,7 +11,7 @@ void Projectile::Update(float dt)
 
 void Projectile::OnCollision(Actor* other)
 {
-	if (other->m_tag != m_tag)
+	if (other->m_tag != this->m_tag)
 	{
 		m_destroyed = true;
 	}

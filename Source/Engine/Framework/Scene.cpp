@@ -9,7 +9,7 @@ namespace umbra
 		while (iter != m_actors.end())
 		{
 			(*iter)->Update(dt);
-			((*iter)->m_destroyed) ? iter = m_actors.erase(iter) : ++iter;
+			((*iter)->m_destroyed) ? iter = m_actors.erase(iter) : iter++;
 		}
 
 		//check collisions

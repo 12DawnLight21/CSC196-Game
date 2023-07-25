@@ -4,6 +4,8 @@
 #include "Input/InputSystem.h"
 #include "Renderer/Renderer.h"
 
+#include "Game/SpaceRanch.h"
+
 void Player::Update(float dt)
 {
 	//movement
@@ -38,12 +40,8 @@ void Player::OnCollision(Actor* other)
 {
 	if (other->m_tag == "EnemyBullet")
 	{
-		m_health - m_damage;
-		if (m_health <= 0) m_destroyed = true;
+		m_game->SetLives(m_game->GetLives() - 1);
+		dynamic_cast<SpaceRanch*>(m_game)->SetState(SpaceRanch::eState::PlayerDead);
 	}
 
-	/*if (other->m_tag = "Powerup")
-	{
-		m_health = 100;
-	}*/
 }

@@ -3,11 +3,15 @@
 #include "Renderer/ModelManager.h"
 #include "Input/InputSystem.h"
 #include "Framework/Scene.h"
+#include "Framework/Emitter.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Audio/AudioSystem.h"
 #include "Renderer/Font.h"
 #include "Renderer/Text.h"
+#include "Renderer/ParticleSystem.h"
+
+#include "SpaceRanch.h"
 
 #include <thread>
 #include <iostream> //searches the system instead
@@ -67,12 +71,11 @@ int main(int argc, char* argv[])
 	umbra::g_renderer.CreateWindow("CSC196", 800, 600);
 
 	umbra::g_inputSystem.Initialize();
-
 	umbra::g_audioSystem.Initialize();
-	umbra::g_audioSystem.AddAudio("shoot", "shoot.wav"); //instead of using shoot.wav, we can just call shoot
 
-	umbra::vec2 v{5, 5};
-	v.Normalize();
+	unique_ptr<SpaceRanch> game = make_unique<SpaceRanch>();
+	game->Initialize();
+
 
 	vector<Star> stars; //not in a namespace so its fine
 	for (int i = 0; i < 500; i++) //makes the star background ;3
@@ -83,25 +86,6 @@ int main(int argc, char* argv[])
 		stars.push_back(Star(pos, vel));
 	}
 
-	umbra::Scene scene;
-	std::unique_ptr<Player> player = make_unique<Player>(200.0f, umbra::Pi, umbra::Transform{ {400, 300}, 0, 6 }, umbra::g_manager.Get("player.txt"));
-	player->m_tag = "Player";
-	scene.Add(std::move(player)); //creates player in main part of memory
-
-	for (int i = 0; i < 10; i++)
-	{
-		std::unique_ptr<Enemy> enemy = make_unique<Enemy>(umbra::randomf(75.0f, 150.0f), umbra::Pi, umbra::Transform{ { umbra::random(800), umbra::random(600)}, umbra::randomf(umbra::TwoPi), 6 }, umbra::g_manager.Get("ship.txt"));
-		enemy->m_tag = "Enemy";
-		scene.Add(std::move(enemy));
-	}
-
-	//create font / text objects
-	std::shared_ptr<umbra::Font> font = std::make_shared<umbra::Font>("MinecraftRegular.ttf", 24);
-
-	std::unique_ptr<umbra::Text> text = std::make_unique<umbra::Text>(font);
-	text->Create(umbra::g_renderer, "NEUMONT", umbra::Color{1, 1, 1, 1});
-
-
 	bool quit = false;
 	// Main GAME LOOP
 	while (!quit)
@@ -110,12 +94,13 @@ int main(int argc, char* argv[])
 		umbra::g_time.Tick();
 		umbra::g_inputSystem.Update(); //checks for input updates 
 		umbra::g_audioSystem.Update(); //updates the audio systems
+		umbra::g_particleSystem.Update(umbra::g_time.GetDeltaTime());
 
 		//update game
-		scene.Update(umbra::g_time.GetDeltaTime());
+		game->Update(umbra::g_time.GetDeltaTime());
+
 		umbra::g_renderer.SetColor(0, 0, 0, 0); //sets color to black
 		umbra::g_renderer.BeginFrame(); //clears the screen, allows for less static
-
 
 		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_ESCAPE)) //if esc is pressed, end the thing
 		{
@@ -124,7 +109,28 @@ int main(int argc, char* argv[])
 
 		if (umbra::g_inputSystem.GetMouseButtonDown(0)) //if mouse clicked, clicked the mouse
 		{
-			cout << "Mouse pressed." << endl;
+			/*
+			umbra::EmitterData data;
+			data.burst = true;
+			data.burstCount = 100;
+			data.spawnRate = 200;
+			data.angle = 0;
+			data.angleRange = umbra::Pi;
+			data.lifetimeMin = 0.5f;
+			data.lifetimeMin = 1.5f;
+			data.speedMin = 50;
+			data.speedMax = 250;
+			data.damping = 0.5f;
+			data.color = umbra::Color{ 1, 0, 0, 1 };
+
+			umbra::Transform transform{ { umbra::g_inputSystem.GetMousePosition() }, 0, 1 };
+			auto emitter = std::make_unique<umbra::Emitter>(transform, data);
+			//emitter->m_lifespan = 1.0f; rewrote this to be better?
+			emitter->SetLifespan(emitter->GetLifespan());
+			scene.Add(std::move(emitter));
+
+			cout << "Left Mouse pressed." << endl;
+			*/
 		}
 
 		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_M))
@@ -145,59 +151,16 @@ int main(int argc, char* argv[])
 			umbra::g_renderer.SetColor(umbra::random(256), umbra::random(256), umbra::random(256), 255);
 			umbra::g_renderer.DrawPoint(star.m_pos.x, star.m_pos.y);
 		}
-		
-		scene.Draw(umbra::g_renderer);
-		text->Draw(umbra::g_renderer, 400, 300);
+
+		game->Draw(umbra::g_renderer);
+
+		umbra::g_particleSystem.Draw(umbra::g_renderer);
+
 
 		umbra::g_renderer.EndFrame();
 	}
 
 	stars.clear();
-	scene.RemoveAll();
 
 	return 0; 
 }
-
-
-
-// taxi game??
-// chaos simulator (youre shadow the hedgehog. enough said)
-	//shadow the ehdgehog game but lines and its way better
-// replicate that penguin asteroids game you saw on that one youtube channel
-// legend of zelda with OG sword mechanics? 
-
-
-	
-	/*
-	//umbra::CreateWindow("CSC196", 800, 600);
-	//cin.get(); // is a pause, prevents window from opening/closing too fast
-	//memory time fellas
-	umbra::g_memoryTracker.DisplayInfo();
-	int* p = new int; //holds the ADDRESS of an int
-	umbra::g_memoryTracker.DisplayInfo();
-	delete p;
-	umbra::g_memoryTracker.DisplayInfo();
-	umbra::Time timer;
-	for (int i = 0; i < 10000000000000000000; i++) {}
-	cout << timer.GetElapsedSeconds() << endl;
-	//chrono time, literally	
-	//auto start = std::chrono::high_resolution_clock::now(); //auto - figures out the datatype by the code assignment
-	//for (int i = 0; i < 10000000000000000000; i++) {}
-	//auto end = std::chrono::high_resolution_clock::now();
-	//cout << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() << endl; //<casts> it into microsecodns
-	cout << umbra::getFilePath() << endl;
-	umbra::setFilePath("Assets"); //not case sensitive
-	cout << umbra::getFilePath() << endl;
-	size_t size;
-	umbra::getFileSize("game.txt", size);
-	cout << size << endl;
-	std::string s;
-	umbra::readFile("game.txt", s);
-	cout << s << endl;
-	// ../ goes back a SINGLE directory, can nagivate the entire directory
-	umbra::seedRandom((unsigned int)time(nullptr)); //returns system time in seconds starting // () is a cast
-	for (int i = 0; i < 10; i++)
-	{
-		cout << umbra::random(10, 20) << endl;
-	}
-	*/

@@ -5,6 +5,8 @@
 #include "Input/InputSystem.h"
 #include "Renderer/Renderer.h"
 
+#include "Game/SpaceRanch.h"
+
 void Enemy::Update(float dt)
 {
 	Actor::Update(dt);
@@ -47,7 +49,8 @@ void Enemy::OnCollision(Actor* other)
 
 	if (other->m_tag == "PlayerBullet")
 	{
-		m_health -= m_health;
-		if (m_health <= 0) m_destroyed = true;
+		m_game->AddPoints(100);
+		m_destroyed = true;
+		dynamic_cast<SpaceRanch*>(m_game)->SetState(SpaceRanch::eState::PlayerDead);
 	}
 }

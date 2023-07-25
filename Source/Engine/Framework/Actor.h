@@ -15,18 +15,23 @@ namespace umbra
 		virtual void Update(float dt); //dt = delta time
 		virtual void Draw(umbra::Renderer& renderer);
 
-		float GetRadius() { return m_model->GetRadius() * m_transform.scale; };
+		float GetRadius() { return (m_model) ? m_model->GetRadius() * m_transform.scale : 0; };
 		virtual void OnCollision(Actor* other) {};
+
+		float GetLifespan() { return m_lifespan; };
+		float SetLifespan(float lifespan) { return m_lifespan = lifespan; };
 
 		class Scene* m_scene = nullptr; //inline forward declaration
 		friend class Scene;
+
+		class Game* m_game = nullptr;
 
 		umbra::Transform m_transform;
 		std::string m_tag;
 
 	protected:
 		bool m_destroyed = false; //a flag
-		float m_lifespan = -1.0f;
+		float m_lifespan = 1.0f;
 
 		std::shared_ptr<Model> m_model;
 	};
