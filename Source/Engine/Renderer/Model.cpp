@@ -1,6 +1,3 @@
-
-
-
 #include "Model.h"
 #include <sstream>
 
@@ -58,6 +55,7 @@ namespace umbra
 	{
 		Draw(renderer, transform.position, transform.rotation, transform.scale);
 	}
+
 	float Model::GetRadius()
 	{
 		if (m_radius) return m_radius;

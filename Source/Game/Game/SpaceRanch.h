@@ -11,7 +11,9 @@ public:
 		StartGame,
 		StartLevel,
 		Game,
+		PlayerDeadStart,
 		PlayerDead,
+		GameOverStart,
 		GameOver
 	};
 
@@ -29,7 +31,10 @@ private:
 	float m_spawnTimer = 0;
 	float m_spawnTime = 3.0f; //every 3 secs, spawn enemy
 
+	float m_stateTimer = 0;
+
 	std::shared_ptr<umbra::Font> m_font;
 	std::unique_ptr<umbra::Text> m_scoreText;
 	std::unique_ptr<umbra::Text> m_titleText;
+	std::unique_ptr<umbra::Text> m_gameOverText;
 };

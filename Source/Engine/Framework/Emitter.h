@@ -28,7 +28,7 @@ namespace umbra
 	public:
 		Emitter() = default;
 		Emitter(const Transform& transform, const EmitterData& data) :
-			Actor{ transform, NULL },
+			Actor{ transform },
 			m_data{ data } 
 		{};
 		

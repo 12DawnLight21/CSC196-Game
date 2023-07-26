@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 	umbra::seedRandom((unsigned int)time(nullptr));
 	umbra::setFilePath("assets");
 
-	int* p = new int;
+	//int* p = new int;
 	//delete p;
 
 	//our window setup
@@ -76,6 +76,7 @@ int main(int argc, char* argv[])
 	unique_ptr<SpaceRanch> game = make_unique<SpaceRanch>();
 	game->Initialize();
 
+	umbra::g_audioSystem.PlayOneShot("bg_music", true); //song is The Hand of the Queen from the game Rectangle Guy
 
 	vector<Star> stars; //not in a namespace so its fine
 	for (int i = 0; i < 500; i++) //makes the star background ;3
@@ -107,37 +108,6 @@ int main(int argc, char* argv[])
 			quit = true;
 		}
 
-		if (umbra::g_inputSystem.GetMouseButtonDown(0)) //if mouse clicked, clicked the mouse
-		{
-			/*
-			umbra::EmitterData data;
-			data.burst = true;
-			data.burstCount = 100;
-			data.spawnRate = 200;
-			data.angle = 0;
-			data.angleRange = umbra::Pi;
-			data.lifetimeMin = 0.5f;
-			data.lifetimeMin = 1.5f;
-			data.speedMin = 50;
-			data.speedMax = 250;
-			data.damping = 0.5f;
-			data.color = umbra::Color{ 1, 0, 0, 1 };
-
-			umbra::Transform transform{ { umbra::g_inputSystem.GetMousePosition() }, 0, 1 };
-			auto emitter = std::make_unique<umbra::Emitter>(transform, data);
-			//emitter->m_lifespan = 1.0f; rewrote this to be better?
-			emitter->SetLifespan(emitter->GetLifespan());
-			scene.Add(std::move(emitter));
-
-			cout << "Left Mouse pressed." << endl;
-			*/
-		}
-
-		if (umbra::g_inputSystem.getKeyDown(SDL_SCANCODE_M))
-		{
-			umbra::g_audioSystem.PlayOneShot("shoot");
-		}
-
 		//update draw
 		umbra::Vector2 vel(1.0f, 0.3f);
 
@@ -154,9 +124,6 @@ int main(int argc, char* argv[])
 
 		game->Draw(umbra::g_renderer);
 
-		umbra::g_particleSystem.Draw(umbra::g_renderer);
-
-
 		umbra::g_renderer.EndFrame();
 	}
 
@@ -164,3 +131,19 @@ int main(int argc, char* argv[])
 
 	return 0; 
 }
+
+// 5 additions to the game ive made for the final
+// background music / enemy & player shoot sounds (one for player one for enemy)
+// player is white , enemy is red
+
+
+//things i might add
+// new weapon (hopefully it actually shoots)
+// a new enemy + new model for the enemy (takes 2 shots to kill instead o 1)
+
+// life display (p easy might do now)
+
+// powerup for multiplier? (markiplier??)
+// might actually do waves instead o random gen enemies, pin in this tho
+// maybe not asteroids but another innanimate object with a diff color would be cool
+// differentiate enemies and the player using different colors (blue for powers and yellow for unkillables)

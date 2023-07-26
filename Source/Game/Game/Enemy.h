@@ -9,7 +9,7 @@ public:
 		m_speed{ speed },
 		m_turnRate{ turnRate }
 	{
-		m_fireRate = 5.0f;
+		m_fireRate = 3.0f;
 		m_fireTimer = m_fireRate;
 	};
 
