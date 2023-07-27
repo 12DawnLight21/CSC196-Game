@@ -55,9 +55,7 @@ void Enemy::Update(float dt)
 
 void Enemy::OnCollision(Actor* other)
 {
-	//dynamic_cast<Player*>(other) returns a player or null
-
-	if (other->m_tag == "PlayerBullet")
+	if (other->m_tag == "PlayerBullet"  || other->m_tag == "Player")
 	{
 		//create explosion
 		umbra::EmitterData data;

@@ -134,16 +134,16 @@ int main(int argc, char* argv[])
 
 // 5 additions to the game ive made for the final
 // background music / enemy & player shoot sounds (one for player one for enemy)
-// player is white , enemy is red
+// player is white , enemy is red / blue is powerups / life is now displayed
+// two types of attacks: head on collision and also projectiles
+// tutorial level added / game over screen 
+// added powerup class ; can heal player for 1-5 health every spawn (8 secs)
 
 
-//things i might add
-// new weapon (hopefully it actually shoots)
-// a new enemy + new model for the enemy (takes 2 shots to kill instead o 1)
 
-// life display (p easy might do now)
+
 
 // powerup for multiplier? (markiplier??)
 // might actually do waves instead o random gen enemies, pin in this tho
 // maybe not asteroids but another innanimate object with a diff color would be cool
-// differentiate enemies and the player using different colors (blue for powers and yellow for unkillables)
+// differentiate enemies and the player using different colors (yellow for unkillables)

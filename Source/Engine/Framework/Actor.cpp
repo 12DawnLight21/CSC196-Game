@@ -4,11 +4,11 @@ namespace umbra
 {
 	void Actor::Update(float dt)
 	{
-		if (m_lifespan != m_lifespan)
+		if (m_lifespan != -1)
 		{
-			m_lifespan = m_lifespan - dt;
+			m_lifespan -= dt;
+			m_destroyed = (m_lifespan <= 0);
 		}
-		if (m_lifespan <= 0) m_destroyed = true;
 
 		m_transform.position += m_velocity * dt;
 		m_velocity *= std::pow(1.0f - m_damping, dt);

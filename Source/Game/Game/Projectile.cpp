@@ -2,6 +2,8 @@
 
 void Projectile::Update(float dt)
 {
+	Actor::Update(dt);
+
 	umbra::vec2 forward = umbra::vec2(0, -1).Rotate(m_transform.rotation);
 	m_transform.position += forward * m_speed * umbra::g_time.GetDeltaTime();
 
